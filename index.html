@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#14293f"><meta name="description" content="厚泽男装店铺按日期、商品及订单查看利润与成本的经营看板。">
   <title>厚泽男装 · 利润看板</title>
-  <link rel="stylesheet" href="./style.css"><script type="module" src="./app.mjs"></script>
+  <link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./analytics.css"><script type="module" src="./app.mjs"></script>
 </head>
 <body>
   <svg class="icon-defs" aria-hidden="true"><defs>
@@ -39,13 +39,15 @@
           <div class="filter-bottom"><label class="search-field"><svg><use href="#i-search"/></svg><input type="search" id="searchInput" placeholder="搜索商品、货号或订单号" aria-label="搜索商品或订单"></label><select id="productFilter" aria-label="筛选商品"><option value="">全部商品</option></select><select id="statusFilter" aria-label="筛选订单状态"><option value="all">全部订单及费用</option><option value="expense">独立推广费用</option><option value="active">未退款订单</option><option value="refund">退款成功</option><option value="pending">待发货</option></select><select id="profitFilter" aria-label="筛选订单盈亏"><option value="all">全部订单盈亏</option><option value="positive">盈利订单</option><option value="negative">亏损订单</option><option value="zero">零利润订单</option></select><button class="reset-button" id="resetButton">重置</button></div>
         </section>
         <div class="scope-line"><span id="scopeText">正在读取利润数据…</span><button id="clearDrill" hidden>返回全部数据 <span>↗</span></button></div>
-        <div class="coverage-note">已核对全部 6,525 行订单：5,487 笔成交、1,038 笔未成交。运费含 205 包平台预估及 953 包按 ¥2.60 预留；11 月 2 日推广 ¥4,144 为用户补录。退款状态已更新至 11 月 2 日。</div>
+        <div class="coverage-note">已核对全部 6,525 行订单：5,487 笔成交、1,038 笔未成交。运费含 205 包平台预估及 953 包按 ¥2.60 预留；11 月 2 日推广 ¥4,144 为用户补录。利润核算快照截至 20:46；售后分析另更新至 21:34，二者时点与口径见分析区说明。</div>
+        <nav class="section-links" aria-label="看板章节"><a href="#kpis">利润汇总</a><a href="#daily-business">每日经营</a><a href="#refund-analysis">售后退款</a><a href="#price-analysis">价格关联</a><a href="#dataTable">逐项明细</a></nav>
         <section class="kpi-grid" aria-label="利润汇总" id="kpis"></section>
         <div class="charts-grid">
           <section class="panel trend-panel"><div class="panel-heading"><div><h2>每日利润表现</h2><span>点击日期，查看该日商品</span></div><span class="legend-dot">预计利润</span></div><div id="profitChart" class="profit-chart"></div></section>
           <section class="panel cost-panel"><div class="panel-heading"><div><h2>成本构成</h2><span id="costCaption">费用占总成本比例</span></div><button class="icon-button" id="methodCost" aria-label="查看成本计算口径"><svg><use href="#i-info"/></svg></button></div><div id="costChart"></div></section>
         </div>
-        <section class="panel detail-panel"><div class="table-top"><div><h2 id="tableTitle">每日利润明细</h2><p id="tableSubtitle">按成交日期归属，退款状态更新至导出时点。</p></div><div class="view-switch" aria-label="切换维度"><button class="active" data-view="day">按天</button><button data-view="product">按商品</button><button data-view="order">按订单</button></div></div><div class="table-scroll"><table id="dataTable"><thead id="tableHead"></thead><tbody id="tableBody"></tbody><tfoot id="tableFoot"></tfoot></table></div><div class="table-bottom"><span id="resultCount"></span><div class="pagination" id="pagination"></div></div></section>
+        <div id="analyticsRoot"></div>
+        <section class="panel detail-panel"><div class="table-top"><div><h2 id="tableTitle">每日利润明细</h2><p id="tableSubtitle">按成交日期归属，退款状态更新至导出时点。</p></div><div class="view-switch" aria-label="切换维度"><button class="active" data-view="day">按天</button><button data-view="product">按商品</button><button data-view="order">按订单</button></div></div><div class="table-scroll"><table id="dataTable"><thead id="tableHead"></thead><tbody id="tableBody"></tbody><tfoot id="tableFoot"></tfoot></table></div><div class="table-bottom"><span id="resultCount"></span><div class="table-page-controls"><label for="pageSizeSelect">每页</label><select id="pageSizeSelect" aria-label="每页显示条数"><option value="100">100 条</option><option value="250">250 条</option><option value="500">500 条</option><option value="1000" selected>1,000 条</option><option value="2000">2,000 条</option></select><div class="pagination" id="pagination"></div></div></div></section>
         <footer class="footer"><span><span class="estimate-dot"></span>含预估费用 · 非最终税后利润</span><button id="methodFooter">查看核算说明 <svg><use href="#i-arrow"/></svg></button></footer>
       </div>
     </main>

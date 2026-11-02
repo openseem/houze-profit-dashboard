@@ -1,7 +1,9 @@
+import {initAnalytics} from './analytics.mjs';
 import {DATA} from './data.mjs';
 import {COSTS,normalize,filterRows,metrics,aggregate,sortGroups} from './core.mjs';
 
 const rows=normalize(DATA.rows);
+const analytics=initAnalytics();
 const startDate=DATA.dates[0],endDate=DATA.dates.at(-1);
 const el=id=>document.getElementById(id);
 const icon=name=>`<svg aria-hidden="true"><use href="#i-${name}"/></svg>`;
@@ -11,7 +13,7 @@ const amount=c=>`¥${money(c)}`;
 const percent=x=>x==null?'不适用':(x*100).toFixed(2)+'%';
 const count=n=>new Intl.NumberFormat('zh-CN').format(n);
 const profitClass=n=>n<0?'loss-number':n>0?'profit-number':'neutral-number';
-const state={view:'day',sort:'date',direction:'asc',page:1,pageSize:15,start:startDate,end:endDate,product:'',query:'',status:'all',profit:'all'};
+const state={view:'day',sort:'date',direction:'asc',page:1,pageSize:1000,start:startDate,end:endDate,product:'',query:'',status:'all',profit:'all'};
 let filtered=[],groups=[],total=metrics([]),toastTimer;
 const productOptions=[...new Map(rows.map(r=>[r.goods_id,r])).values()].sort((a,b)=>a.code.localeCompare(b.code));
 el('productFilter').insertAdjacentHTML('beforeend',productOptions.map(p=>`<option value="${esc(p.goods_id)}">${esc(p.code)} · ${esc(p.goods_id==='1018651466560'?'补差价收入':p.name)}</option>`).join(''));
@@ -30,7 +32,7 @@ function render(){
   const days=new Set(filtered.map(r=>r.date)).size,products=new Set(filtered.map(r=>r.goods_id)).size;
   el('scopeText').innerHTML=state.start>state.end?'开始日期晚于结束日期，请调整筛选范围。':`${esc(state.start.replaceAll('-','.'))} — ${esc(state.end.replaceAll('-','.'))}<span class="scope-separator">　·　</span><strong>${days} 天 / ${products} 个商品 / ${count(total.orders)} 笔成交 / ${total.expenses} 笔独立费用</strong>`;
   el('clearDrill').hidden=!(state.product||state.start!==startDate||state.end!==endDate||state.query||state.status!=='all'||state.profit!=='all');
-  renderKpis();renderCharts();renderTable();
+  renderKpis();renderCharts();renderTable();analytics.update(filtered,state);
 }
 function renderKpis(){
   const cards=[
@@ -126,6 +128,7 @@ for(const id of ['methodSidebar','methodCost','methodFooter'])el(id).addEventLis
 document.querySelectorAll('.close-dialog').forEach(b=>b.addEventListener('click',()=>b.closest('dialog').close()));
 for(const id of ['methodDialog','orderDialog'])el(id).addEventListener('click',e=>{if(e.target===el(id)){const b=el(id).getBoundingClientRect();if(e.clientX<b.left||e.clientX>b.right||e.clientY<b.top||e.clientY>b.bottom)el(id).close();}});
 el('exportButton').addEventListener('click',exportCsv);
+el('pageSizeSelect').addEventListener('change',()=>{state.pageSize=Number(el('pageSizeSelect').value);state.page=1;renderTable();});
 syncFilters();render();
 
 document.querySelectorAll('input[type=date]').forEach(e=>{e.min=startDate;e.max=endDate;});
