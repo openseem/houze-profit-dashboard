@@ -42,9 +42,9 @@ function renderKpis(){
   el('kpis').innerHTML=cards.map(c=>`<article class="kpi ${c.profit?'profit':''}"><div class="kpi-label"><span>${c.label}</span><span class="kpi-code">${c.code}</span></div><strong class="kpi-value ${c.profit&&total.profit<0?'negative':''}">${c.currency?'<span class="currency">¥</span>':''}${c.value}</strong><div class="kpi-foot">${c.foot}</div></article>`).join('');
 }
 function renderCharts(){
-  const days=sortGroups(aggregate(filtered,'day'),'date','asc');
+  const days=sortGroups(aggregate(filtered,'day'),'date','desc');
   const max=Math.max(...days.map(d=>Math.abs(d.profit)),1);
-  el('profitChart').innerHTML=days.length?days.map(d=>`<button class="trend-item" data-action="day" data-key="${esc(d.key)}" aria-label="查看${d.date}商品利润"><span class="trend-date">${d.date.slice(5).replace('-',' / ')}<small>${d.orders} 笔成交</small></span><span class="bar-track"><span class="bar-fill ${d.profit<0?'loss':''}" style="width:${Math.max(1,Math.abs(d.profit)/max*95)}%"></span></span><span class="trend-amount ${profitClass(d.profit)}">${amount(d.profit)}<small>利润率 ${percent(d.margin)}</small></span></button>`).join('')+'<div class="chart-caption">按成交日期归属 · 订单退款状态截至 10 月 29 日</div>':'<div class="empty-state"><strong>当前筛选下没有数据</strong><p>调整日期或清除其他筛选条件。</p></div>';
+  el('profitChart').innerHTML=days.length?days.map(d=>`<button class="trend-item" data-action="day" data-key="${esc(d.key)}" aria-label="查看${d.date}商品利润"><span class="trend-date">${d.date.slice(5).replace('-',' / ')}<small>${d.orders} 笔成交</small></span><span class="bar-track"><span class="bar-fill ${d.profit<0?'loss':''}" style="width:${Math.max(1,Math.abs(d.profit)/max*95)}%"></span></span><span class="trend-amount ${profitClass(d.profit)}">${amount(d.profit)}<small>利润率 ${percent(d.margin)}</small></span></button>`).join('')+'<div class="chart-caption">按成交日期归属 · 订单退款状态截至 11 月 2 日</div>':'<div class="empty-state"><strong>当前筛选下没有数据</strong><p>调整日期或清除其他筛选条件。</p></div>';
   el('costCaption').textContent=`合计 ${amount(total.totalCost)} · 含预留费用`;
   el('costChart').innerHTML=`<div class="stacked-bar" aria-label="成本占比">${COSTS.filter(([k])=>total[k]>0).map(([k,label,color])=>`<span title="${label} ${amount(total[k])}" style="width:${total.totalCost?total[k]/total.totalCost*100:0}%;background:${color}"></span>`).join('')}</div><div class="cost-legend">${COSTS.map(([k,label,color])=>`<div class="cost-item"><i style="background:${color}"></i><span>${label}</span><strong>${money(total[k])}<small>${total.totalCost?(total[k]/total.totalCost*100).toFixed(1):'0.0'}%</small></strong></div>`).join('')}</div>`;
 }
@@ -58,7 +58,7 @@ function productCell(g,compact=false){
 }
 function statusBadge(order){const cls=order.refund_flag?'refund':order.status==='待发货'?'pending':'normal';return `<span class="status ${cls}">${esc(order.status)}</span>`;}
 function cell(g,key){
-  if(key==='date')return `<span class="date-label">${esc(g.date)}${g.date==='2026-10-29'?'<span class="date-tag">部分数据</span>':''}</span>`;
+  if(key==='date')return `<span class="date-label">${esc(g.date)}${g.date===endDate?'<span class="date-tag">部分数据</span>':''}</span>`;
   if(key==='key')return `<button class="order-id" data-action="order" data-key="${esc(g.key)}">${esc(g.key)}</button><div class="order-date">${esc(g.order.time)}</div>`;
   if(key==='name')return productCell(g,state.view==='order');
   if(key==='status')return statusBadge(g.order);
@@ -87,7 +87,7 @@ function openOrder(orderId){
   const r=rows.find(r=>r.order===orderId);if(!r)return;
   const fee=(label,value,description='',total=false)=>`<div class="fee-line ${total?'total':''}"><span>${label}${description?`<small>${esc(description)}</small>`:''}</span><strong>${value}</strong></div>`;
   const costs=COSTS.map(([k,label])=>{
-    let description='';if(k==='ad')description='先归属商品，再按商品同日净收入分摊';if(k==='freight')description=r.freight_basis;if(k==='insurance')description=r.insurance_basis;if(k==='package')description=`${r.qty} 件 × ${amount(r.pack_unit)}，已含人工场地`;if(k==='cost')description=`采购单价 ${amount(r.unit)} · ${r.match}`;if(k==='platform')description='按当天退款后收入0.6%预估并分配';if(k==='tax')description='按当天退款后收入1%预留并分配';
+    let description='';if(k==='ad')description=r.ad_basis||'先归属商品，再按商品同日净收入分摊';if(k==='freight')description=r.freight_basis;if(k==='insurance')description=r.insurance_basis;if(k==='package')description=`${r.qty} 件 × ${amount(r.pack_unit)}，已含人工场地`;if(k==='cost')description=`采购单价 ${amount(r.unit)} · ${r.match}`;if(k==='platform')description='按当天退款后收入0.6%预估并分配';if(k==='tax')description='按当天退款后收入1%预留并分配';
     return fee(label,(r[k]?'−':'')+amount(r[k]),description);
   }).join('');
   el('orderDetails').innerHTML=`<div class="drawer-content"><div class="drawer-order"><div class="drawer-order-top"><span class="order-id">${esc(r.order)}</span><button class="icon-button" id="copyOrder" aria-label="复制订单号">${icon('copy')}</button></div><p>${esc(r.name)}</p><small>${esc(r.code)} · ${esc(r.spec)} · ${r.qty} 件<br>${esc(r.time)}</small><div style="margin-top:10px">${statusBadge(r)}</div></div><div class="drawer-section-title">收入</div>${fee('商家实收',amount(r.gross))}${fee('退款金额',(r.refund?'−':'')+amount(r.refund),r.refund_flag?'成功退款暂按全额退款':'')}${fee('退款后收入',amount(r.net),'',true)}<div class="drawer-section-title">成本与费用</div>${costs}${r.recovered_cost?fee('已恢复货品成本','+'+amount(r.recovered_cost),'完好退货入库；已在净货品成本中抵减'):''}${fee('总成本与费用',amount(r.totalCost),'',true)}<div class="drawer-profit"><div><span>预计利润</span><small>利润率 ${percent(r.net?r.profit/r.net:null)}</small></div><strong class="${profitClass(r.profit)}">${amount(r.profit)}</strong></div>${r.note?`<div class="drawer-warning">${esc(r.note)}</div>`:''}<div class="drawer-warning">逐单推广为估算分摊；手续费、税费及待出账费用仍需后续校准。</div></div>`;
