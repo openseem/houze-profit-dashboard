@@ -39,6 +39,6 @@ export function durationStats(values){
 }
 export function caseStats(cases){
  const success=cases.filter(c=>c.status==='退款成功'),post=success.filter(c=>c.phase==='发货后申请');
- const pending=cases.filter(c=>['待商家处理','已同意退货退款，待用户发货'].includes(c.status));
+ const pending=cases.filter(c=>['待商家处理','已同意退货退款，待用户发货','已同意拒收退款，待用户拒收'].includes(c.status));
  return {pending:new Set(pending.map(c=>c.order)).size,pendingAmount:pending.reduce((s,c)=>s+c.amount,0),exchanges:cases.filter(c=>c.status==='换货补寄成功').length,postCases:post.length,shipApply:durationStats(post.map(c=>c.shipApply)),applyApprove:durationStats(post.map(c=>c.applyApprove)),shipApprove:durationStats(post.map(c=>c.shipApprove)),reasons:[...post.reduce((m,c)=>m.set(c.reason,(m.get(c.reason)||0)+1),new Map())].sort((a,b)=>b[1]-a[1])};
 }
