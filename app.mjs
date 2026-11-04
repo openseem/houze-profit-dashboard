@@ -5,7 +5,7 @@ import {COSTS,normalize,filterRows,metrics,aggregate,sortGroups} from './core.mj
 
 const rows=normalize(DATA.rows);
 const analytics=initAnalytics();
-const operations=initOperations({onSelectProduct:goods=>{state.product=goods;syncFilters();setView('product');}});
+const operations=initOperations({allRows:rows,aliases:DATA.cost_alias||{},onSelectProduct:goods=>{state.product=goods;syncFilters();setView('product');}});
 const startDate=DATA.dates[0],endDate=DATA.dates.at(-1);
 const el=id=>document.getElementById(id);
 const icon=name=>`<svg aria-hidden="true"><use href="#i-${name}"/></svg>`;
