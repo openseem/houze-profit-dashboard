@@ -1,9 +1,11 @@
 import {initAnalytics} from './analytics.mjs';
+import {initOperations} from './ops.mjs';
 import {DATA} from './data.mjs';
 import {COSTS,normalize,filterRows,metrics,aggregate,sortGroups} from './core.mjs';
 
 const rows=normalize(DATA.rows);
 const analytics=initAnalytics();
+const operations=initOperations({onSelectProduct:goods=>{state.product=goods;syncFilters();setView('product');}});
 const startDate=DATA.dates[0],endDate=DATA.dates.at(-1);
 const el=id=>document.getElementById(id);
 const icon=name=>`<svg aria-hidden="true"><use href="#i-${name}"/></svg>`;
@@ -32,7 +34,7 @@ function render(){
   const days=new Set(filtered.map(r=>r.date)).size,products=new Set(filtered.map(r=>r.goods_id)).size;
   el('scopeText').innerHTML=state.start>state.end?'开始日期晚于结束日期，请调整筛选范围。':`${esc(state.start.replaceAll('-','.'))} — ${esc(state.end.replaceAll('-','.'))}<span class="scope-separator">　·　</span><strong>${days} 天 / ${products} 个商品 / ${count(total.orders)} 笔成交 / ${total.expenses} 笔独立费用</strong>`;
   el('clearDrill').hidden=!(state.product||state.start!==startDate||state.end!==endDate||state.query||state.status!=='all'||state.profit!=='all');
-  renderKpis();renderCharts();renderTable();analytics.update(filtered,state);
+  renderKpis();renderCharts();renderTable();analytics.update(filtered,state);operations.update(filtered,state);
 }
 function renderKpis(){
   const cards=[

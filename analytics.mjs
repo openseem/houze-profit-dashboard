@@ -14,14 +14,14 @@ function tipEvents(host,data,body){
  const show=e=>{const hit=e.target.closest('[data-point]');if(!hit)return;const item=data[Number(hit.dataset.point)];if(!item)return;tip.innerHTML=body(item);tip.hidden=false;const r=host.getBoundingClientRect(),b=hit.getBoundingClientRect();let x=e.clientX??b.x+b.width/2,y=e.clientY??b.y+b.height/2;tip.style.left=Math.max(0,Math.min(host.clientWidth-230,x-r.left+12))+'px';tip.style.top=Math.max(5,y-r.top-35)+'px';};
  host.onpointerover=show;host.onfocusin=show;host.onpointermove=e=>{if(e.target.closest('[data-point]'))show(e);};host.onpointerleave=()=>tip.hidden=true;host.onfocusout=()=>tip.hidden=true;host.onclick=show;
 }
-function lineChart(id,data,series,{money=false,percent=false,label=''}={}){
+export function lineChart(id,data,series,{money=false,percent=false,label='',unit='',showOrders=true}={}){
  const host=$(id);if(!data.length){host.innerHTML='<div class="analytics-empty">当前筛选下没有订单</div>';return;}
  const w=Math.max(host.clientWidth,280),h=244,l=money?64:48,r=20,t=22,b=35,pw=w-l-r,ph=h-t-b;
  const values=data.flatMap(d=>series.map(s=>d[s.key])).filter(v=>v!=null&&Number.isFinite(v));
  const max=percent?Math.min(1,Math.max(.1,Math.ceil(Math.max(...values,0)*1.15*10)/10)):niceMax(Math.max(...values,1)*1.08);
  const x=i=>data.length===1?l+pw/2:l+i*pw/(data.length-1),y=v=>t+ph-v/max*ph;
  const format=v=>percent?(v*100).toFixed(0)+'%':money?(v>=1000000?(v/1000000).toFixed(1)+'万':num(v/100)):num(v);
- let svg=`<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}"><text x="${l}" y="12" class="a-title">${percent?'比例（%）':money?'金额（元）':'订单（单）'}</text>`;
+ let svg=`<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}"><text x="${l}" y="12" class="a-title">${esc(unit||(percent?'比例（%）':money?'金额（元）':'订单（单）'))}</text>`;
  for(let i=0;i<=4;i++){const v=max*i/4,yy=y(v);svg+=`<line class="a-grid" x1="${l}" y1="${yy}" x2="${w-r}" y2="${yy}"/><text x="${l-9}" y="${yy+3}" text-anchor="end">${format(v)}</text>`;}
  svg+=`<line class="a-axis" x1="${l}" y1="${t+ph}" x2="${w-r}" y2="${t+ph}"/>`;
  const step=Math.max(1,Math.ceil((data.length-1)/(w<450?3:6)));
@@ -29,7 +29,7 @@ function lineChart(id,data,series,{money=false,percent=false,label=''}={}){
  for(const s of series){let path='',start=true;data.forEach((d,i)=>{const v=d[s.key];if(v==null){start=true;return;}path+=(start?'M':'L')+x(i).toFixed(1)+','+y(v).toFixed(1);start=false;});svg+=`<path d="${path}" fill="none" stroke="${s.color}" stroke-width="2.2"/>`;
  data.forEach((d,i)=>{if(d[s.key]!=null)svg+=`<circle class="a-point" tabindex="0" role="button" aria-label="${d.date} ${esc(s.label)} ${percent?pct(d[s.key]):money?cash(d[s.key]):num(d[s.key])}" data-point="${i}" cx="${x(i)}" cy="${y(d[s.key])}" r="4.5" fill="${s.color}" stroke="white" stroke-width="1.5"/>`;});}
  host.innerHTML=svg+'</svg><div class="a-tooltip" role="tooltip" hidden></div>';
- tipEvents(host,data,d=>`<strong>${d.date}</strong>${series.map(s=>`<div>${s.label}：${percent?pct(d[s.key]):money?cash(d[s.key]):num(d[s.key])}</div>`).join('')}<div>成交 ${num(d.n)} 单 · 已发货 ${num(d.shipped)} 单</div>`);
+ tipEvents(host,data,d=>`<strong>${d.date}</strong>${series.map(s=>`<div>${s.label}：${percent?pct(d[s.key]):money?cash(d[s.key]):num(d[s.key])}</div>`).join('')}${showOrders?`<div>成交 ${num(d.n)} 单 · 已发货 ${num(d.shipped)} 单</div>`:''}`);
 }
 function barChart(id,bands,color,label){
  const host=$(id),data=bands.filter(d=>d.n>=20);if(!data.length){host.innerHTML='<div class="analytics-empty">各价格段不足 20 单<br>完整数据保留在分组表，暂不作图比较</div>';return;}

@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#14293f"><meta name="description" content="厚泽男装店铺按日期、商品及订单查看利润与成本的经营看板。">
   <title>厚泽男装 · 利润看板</title>
-  <link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./analytics.css"><script type="module" src="./app.mjs"></script>
+  <link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./analytics.css"><link rel="stylesheet" href="./ops.css"><script type="module" src="./app.mjs"></script>
 </head>
 <body>
   <svg class="icon-defs" aria-hidden="true"><defs>
@@ -40,8 +40,9 @@
         </section>
         <div class="scope-line"><span id="scopeText">正在读取利润数据…</span><button id="clearDrill" hidden>返回全部数据 <span>↗</span></button></div>
         <div class="coverage-note">已核对全部 7,186 行订单：6,039 笔成交、1,147 笔未成交。运费账单截至 11/02：205 包按账单预估、1,377 包按 ¥2.60 预留。推广截至 11/03，11/04 ¥4,124 由用户补录。利润快照 11/04 19:09，售后分析截至 19:11。</div>
-        <nav class="section-links" aria-label="看板章节"><a href="#kpis">利润汇总</a><a href="#daily-business">每日经营</a><a href="#refund-analysis">售后退款</a><a href="#price-analysis">价格关联</a><a href="#dataTable">逐项明细</a></nav>
+        <nav class="section-links" aria-label="看板章节"><a href="#kpis">利润汇总</a><a href="#operations">运营诊断</a><a href="#ops-traffic">推广效率</a><a href="#daily-business">每日经营</a><a href="#refund-analysis">售后退款</a><a href="#price-analysis">价格关联</a><a href="#dataTable">逐项明细</a></nav>
         <section class="kpi-grid" aria-label="利润汇总" id="kpis"></section>
+        <div id="operationsRoot"></div>
         <div class="charts-grid">
           <section class="panel trend-panel"><div class="panel-heading"><div><h2>每日利润表现</h2><span>点击日期，查看该日商品</span></div><span class="legend-dot">预计利润</span></div><div id="profitChart" class="profit-chart"></div></section>
           <section class="panel cost-panel"><div class="panel-heading"><div><h2>成本构成</h2><span id="costCaption">费用占总成本比例</span></div><button class="icon-button" id="methodCost" aria-label="查看成本计算口径"><svg><use href="#i-info"/></svg></button></div><div id="costChart"></div></section>
