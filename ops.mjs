@@ -44,7 +44,7 @@ export function initOperations({onSelectProduct,allRows=[],aliases={}}={}){
   bidPlanner.update(s,target);drawAdvice(s);drawProducts(s);
   lineChart('opsBudgetChart',s.daily,[{key:'spend',label:'已分摊推广费',color:'#507bb8'},{key:'budget',label:'保本广告额度（最低0）',color:'#218f83'}],{money:true,label:'每日推广费与保本广告额度'});
   $('opsStressResult').innerHTML=`<div class="ops-stress-main"><span>压力情景利润</span><strong>${cash(s.stress.profit)}</strong><small>情景利润率 ${pct(s.stress.margin)} · 比当前少 ${cash(s.stress.loss)}</small></div><div class="ops-inline-metrics"><span>待收货实物订单 <b>${count(s.stress.orders)}</b></span><span>额外退款假设 <b>${pct(stress)}</b></span><span>期望退款笔数 <b>${count(s.stress.expectedOrders)}</b></span></div>`;
-  $('opsAdScope').textContent=s.contextComplete?(s.adDates.length?`推广报表范围 ${s.adDates[0]} — ${s.adDates.at(-1)} · 总花费 ${cash(a.spend)}。11/04 仅有手工花费，没有曝光、点击及推广归因明细，未纳入本区指标。推广结算额不是实际到账。`:'所选日期或商品没有可用推广明细；当前部分日仅有手工总花费，不能计算点击率、转化与结算投产。'):'订单号、订单状态或盈亏筛选无法与推广归因记录逐单对应。本区暂不计算；保留日期、商品筛选即可恢复。';
+  $('opsAdScope').textContent=s.contextComplete?(s.adDates.length?`推广报表范围 ${s.adDates[0]} — ${s.adDates.at(-1)} · 总花费 ${cash(a.spend)}。${OPS.partialDay.slice(5).replace("-","/")} 仅有手工花费，没有曝光、点击及推广归因明细，未纳入本区指标。推广结算额不是实际到账。`:'所选日期或商品没有可用推广明细；当前部分日仅有手工总花费，不能计算点击率、转化与结算投产。'):'订单号、订单状态或盈亏筛选无法与推广归因记录逐单对应。本区暂不计算；保留日期、商品筛选即可恢复。';
   $('opsFunnel').innerHTML=[['推广曝光',a.impressions],['广告点击',a.clicks],['归因成交笔数',a.deals],['报表结算笔数',a.settledDeals]].map(([l,v])=>`<div><span>${l}</span><strong>${count(v)}</strong></div>`).join('');
   $('opsAdKpis').innerHTML=card('广告点击率',pct(a.ctr),'点击次数÷曝光次数')+card('平均点击成本',cash(a.cpc),'总花费÷点击次数')+card('点击成交笔数比',pct(a.clickDeal),'归因成交笔数÷点击次数 · 非UV转化率')+card('每笔结算成本',cash(a.settledCpa),'总花费÷报表结算笔数');
   drawAdChart(s);drawComparison(s);
