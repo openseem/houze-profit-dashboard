@@ -1,0 +1,18 @@
+/* A separate versioned file keeps month controls usable with a cached base sheet. */
+.filter-top.time-filter{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,1fr);align-items:center;gap:12px 20px;padding:16px 18px}
+.time-filter .date-presets{grid-column:1;grid-row:1;justify-self:start;width:auto;max-width:100%}
+.month-controls{display:flex;align-items:center;gap:8px}
+.time-filter .month-controls,.time-filter .custom-dates{grid-column:2;grid-row:1;justify-self:end;margin-left:0}
+.month-controls button,.month-controls select{border:1px solid #dfe7ef;border-radius:7px;background:#fff;color:#4f6884;padding:8px 11px;font:inherit;font-size:12px;min-height:35px}
+.month-controls button{white-space:nowrap}.month-controls button:hover:not(:disabled){background:#f1f7f6;border-color:#9bc6b9}.month-controls button:disabled{opacity:.35;cursor:default}.month-controls select{min-width:150px}
+.time-filter .custom-dates label{display:flex;align-items:center;gap:6px;font-size:11px;color:#72869b}.time-filter .custom-dates input{min-height:35px}
+.time-shortcuts{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;color:#8193a7}
+.time-filter .time-shortcuts{grid-column:1;grid-row:2}
+.time-shortcuts button{appearance:none;border:1px solid #e1e8ef;border-radius:7px;background:#fff;padding:7px 12px;color:#607993;font-family:inherit;font-size:11px;line-height:1.4;min-height:31px;white-space:nowrap}
+.time-shortcuts button:hover{background:#f4f8fc;border-color:#b8c9dc}.time-shortcuts button.selected{background:#edf5f2;border-color:#8ebdae;color:#267b69;font-weight:600}
+.time-shortcuts small{font-size:10px;color:#99a7b6;line-height:1.6}
+.time-filter .date-range-hint{grid-column:2;grid-row:2;justify-self:end;text-align:right;margin:0;max-width:64ch;font-size:10px;color:#8496a9;line-height:1.8;overflow-wrap:anywhere}
+.month-coverage{display:block;font-size:9px;font-weight:400;color:#879aad;margin-top:6px}
+.time-filter button:focus-visible,.time-filter select:focus-visible,.time-filter input:focus-visible{outline:2px solid #497cf3;outline-offset:2px}
+@media(max-width:1100px){.filter-top.time-filter{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:12px}.time-filter .date-presets{margin:0}.time-filter .month-controls,.time-filter .custom-dates{margin:0;flex-wrap:wrap}.time-filter .time-shortcuts{flex-basis:100%}.time-filter .date-range-hint{flex-basis:100%;max-width:none;text-align:left}.time-filter .custom-dates label{min-width:0}.time-filter .custom-dates input{min-width:0}}
+@media(max-width:540px){.filter-top.time-filter{padding:12px;gap:10px}.time-filter .date-presets{width:100%;flex-basis:100%}.time-filter .month-controls{width:100%;justify-content:space-between;flex-wrap:nowrap}.month-controls select{min-width:0;flex:1}.month-controls button{font-size:11px;padding:7px 9px}.time-filter .custom-dates{width:100%;gap:6px;flex-wrap:nowrap}.time-filter .custom-dates label{flex:1;min-width:0;font-size:10px}.time-filter .custom-dates input{width:100%;padding:8px 4px;min-width:0}.time-shortcuts{gap:6px}.time-shortcuts button{padding:7px 10px}.time-shortcuts small{flex-basis:100%;margin:1px 0 0}.time-filter .date-range-hint{font-size:9px}.navigation{gap:2px}.nav-button{padding:9px}}
