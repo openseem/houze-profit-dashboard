@@ -41,8 +41,20 @@ export function metrics(rows) {
 export function aggregate(rows,view='day') {
   if(view==='order')return rows.map(r=>({...metrics([r]),key:r.order,date:r.date,name:r.name,code:r.code,goods_id:r.goods_id,order:r}));
   const groups=new Map();
-  rows.forEach(r=>{const key=view==='day'?r.date:r.goods_id;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(r);});
-  return [...groups].map(([key,rr])=>({...metrics(rr),key,date:view==='day'?key:null,name:rr[0].name,code:rr[0].code,goods_id:rr[0].goods_id}));
+  rows.forEach(r=>{const key=view==='month'?r.date.slice(0,7):view==='day'?r.date:r.goods_id;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(r);});
+  return [...groups].map(([key,rr])=>({...metrics(rr),key,date:['day','month'].includes(view)?key:null,name:rr[0].name,code:rr[0].code,goods_id:rr[0].goods_id}));
+}
+export function monthRange(month,first,last){
+  if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(month))return null;
+  const [year,n]=month.split('-').map(Number),end=new Date(Date.UTC(year,n,0)).toISOString().slice(0,10);
+  const start=[month+'-01',first].sort().at(-1),stop=[end,last].sort()[0];
+  return start<=stop?{start,end:stop}:null;
+}
+export function presetRange(preset,first,last){
+  if(preset==='all')return {start:first,end:last};
+  if(!['latest','7','30'].includes(preset))return null;
+  const day=new Date(last+'T00:00:00Z');day.setUTCDate(day.getUTCDate()-(preset==='latest'?0:Number(preset)-1));
+  return {start:[day.toISOString().slice(0,10),first].sort().at(-1),end:last};
 }
 export function sortGroups(groups,key,direction='desc') {
   const dir=direction==='asc'?1:-1;
